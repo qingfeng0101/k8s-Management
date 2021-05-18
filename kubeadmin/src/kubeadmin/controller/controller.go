@@ -3,6 +3,7 @@ package controller
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -11,8 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"kubeadmin/model"
 	"net/http"
-
-	"encoding/json"
+	"strconv"
 )
 var upGrader = websocket.Upgrader{
 	CheckOrigin: func (r *http.Request) bool {
@@ -57,17 +57,39 @@ func Pod(c *gin.Context)  {
 
 		pod.Name = p.Name
 		pod.Namespace = p.Namespace
-		pod.Status = p.Status.Phase
 		pod.ContainerNum = len(p.Status.ContainerStatuses)
 		ReadyNum:=0
 		for n:=0;n<len(p.Status.ContainerStatuses);n++{
 			pod.RestartNum = p.Status.ContainerStatuses[n].RestartCount
+			    var con v1.ContainerStateWaiting
+				j,err :=json.Marshal(p.Status.ContainerStatuses[0].State.Waiting)
+				if err != nil {
+					fmt.Println("Marshal err: ", err)
+					return
+				}
+				if string(j) != "null"{
+					//fmt.Println("j: ",string(j))
+					error:=json.Unmarshal(j,&con)
+					if error != nil{
+						fmt.Println("Unmarshal err: ",error)
+						return
+					}
+
+					pod.Status = con.Reason
+					fmt.Println(pod.Status)
+				}else {
+					pod.Status = p.Status.Phase
+				}
+
+				//fmt.Println(p.Status.ContainerStatuses[0].State.Waiting)
+			//fmt.Println(p.Status.Conditions[0].Reason)
 			if p.Status.ContainerStatuses[n].Ready {
 				ReadyNum++
 			}
 		}
 		pod.Ready = ReadyNum
 		pod.Age = p.CreationTimestamp
+		pod.ReadyStr = strconv.Itoa(ReadyNum) + "/" + strconv.Itoa(pod.ContainerNum)
 		PodList = append(PodList, pod)
 	 }
 	Get(c,PodList)
@@ -176,6 +198,11 @@ func GetPodInfo(c *gin.Context)  {
 	Get(c,pod)
 }
 func GetPodlog(c *gin.Context)  {
+	var upGrader = websocket.Upgrader{
+		CheckOrigin: func (r *http.Request) bool {
+			return true
+		},
+	}
 
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -228,7 +255,139 @@ func GetPodlog(c *gin.Context)  {
 			}
 		}
 	}
+}
+func Getdeployment(c *gin.Context)  {
+	// 初始化返回给前端的pod信息的结构体
+	var DPList []model.Deployment
+	DP := model.Deployment{}
+	// 获取前端传过来的参数
+	ns := c.PostForm("namespace")
+	//fmt.Println("命名空间： ",ns)
+	// 查询pods
+	dps := clientset.AppsV1().Deployments(ns)
+	ds,err := dps.List(context.TODO(),metav1.ListOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
 
+	for _,d := range ds.Items{
+       DP.NAME = d.Name
+       DP.NAMESPACE = d.Namespace
+       DP.AGE = d.CreationTimestamp
+       DP.AVAILABLE = d.Status.AvailableReplicas
+       DP.CURRENT = d.Status.Replicas
+       DP.DESIRED = d.Status.Replicas
+       DP.UPTODATE = d.Status.UpdatedReplicas
+       DPList = append(DPList, DP)
 
+	}
+	Get(c,DPList)
+}
+func DeleteDeployment(c *gin.Context)  {
+	var DPList []model.Deployment
+	DP := model.Deployment{}
+	// 接受前端删除参数
+	c.Request.ParseMultipartForm(128)
+	data := c.Request.Form
+	name := data["name"][0]
+	namespace := data["namespace"][0]
+	// 删除操作
+	dps := clientset.AppsV1().Deployments(namespace)
+	err:=dps.Delete(context.TODO(),name,metav1.DeleteOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
+	// 删除后查询deployment列表，返回给前端
+	dps = clientset.AppsV1().Deployments(namespace)
+	ds,err := dps.List(context.TODO(),metav1.ListOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
+	//
+	for _,d := range ds.Items{
+		DP.NAME = d.Name
+		DP.NAMESPACE = d.Namespace
+		DP.AGE = d.CreationTimestamp
+		DP.AVAILABLE = d.Status.AvailableReplicas
+		DP.CURRENT = d.Status.Replicas
+		DP.DESIRED = d.Status.Replicas
+		DP.UPTODATE = d.Status.UpdatedReplicas
+		DP.ISSHOW = false
+		DPList = append(DPList, DP)
 
+	}
+	Get(c,DPList)
+}
+func UpdataDeployment(c *gin.Context)  {
+
+	var DPList []model.Deployment
+	DP := model.Deployment{}
+	// 接受前端删除参数
+	c.Request.ParseMultipartForm(128)
+	data := c.Request.Form
+	name := data["name"][0]
+	namespace := data["namespace"][0]
+	num := data["num"][0]
+	n,_ := strconv.Atoi(num)
+	dnum := int32(n)
+	// 删除操作
+
+	dps := clientset.AppsV1().Deployments(namespace)
+	dp,err:=dps.Get(context.TODO(),name,metav1.GetOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
+	dp.Spec.Replicas = &dnum
+	_,err =dps.Update(context.TODO(),dp,metav1.UpdateOptions{})
+	if err != nil{
+		fmt.Println("updata err: ",err)
+		return
+	}
+	// 扩缩容之后查询，并将结果返回给前端
+	dps = clientset.AppsV1().Deployments(namespace)
+	ds,err := dps.List(context.TODO(),metav1.ListOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
+	//
+	for _,d := range ds.Items{
+		DP.NAME = d.Name
+		DP.NAMESPACE = d.Namespace
+		DP.AGE = d.CreationTimestamp
+		DP.AVAILABLE = d.Status.AvailableReplicas
+		DP.CURRENT = d.Status.Replicas
+		DP.DESIRED = d.Status.Replicas
+		DP.UPTODATE = d.Status.UpdatedReplicas
+		DP.ISSHOW = false
+		DPList = append(DPList, DP)
+
+	}
+	Get(c,DPList)
+}
+func GetNode(c *gin.Context)  {
+	// 初始化返回给前端的pod信息的结构体
+	var NodeList []model.Node
+	Node := model.Node{}
+
+	// 查询pods
+	Nodes := clientset.CoreV1().Nodes()
+	Ns,err := Nodes.List(context.TODO(),metav1.ListOptions{})
+	if err != nil{
+		fmt.Println("pods err: ",err)
+		return
+	}
+
+	for _,n := range Ns.Items{
+		Node.NAME = n.Name
+		Node.STATUS = n.Status.Conditions[3].Type
+        Node.AGE = n.CreationTimestamp
+        Node.VERSION = n.Status.NodeInfo.KubeletVersion
+		NodeList = append(NodeList, Node)
+	}
+	Get(c,NodeList)
 }

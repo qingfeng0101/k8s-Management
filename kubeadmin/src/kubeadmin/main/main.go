@@ -5,20 +5,14 @@ import "kubeadmin/controller"
 
 func main() {
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.GET("/test", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "test",
-		})
-		})
 	r.GET("/namespace",controller.Namespace)
+	r.GET("/nodes",controller.GetNode)
 	r.POST("/pod",controller.Pod)
 	r.POST("/deletepod",controller.DeletePod)
 	r.POST("/getpodinfo",controller.GetPodInfo)
 	r.GET("/getpodlog",controller.GetPodlog)
-	r.Run("0.0.0.0:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.POST("/getdeplyment",controller.Getdeployment)
+	r.POST("/deletedeployment",controller.DeleteDeployment)
+	r.POST("/updatadeployment",controller.UpdataDeployment)
+	r.Run(":8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

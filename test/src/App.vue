@@ -8,9 +8,9 @@
 import Tabbar from './components/Tabbar'
 import { mapState } from 'vuex'
 export default {
-  data() {
+  data () {
     return {
-      isshow: true,
+      isshow: true
     }
   },
   computed: {
