@@ -12,7 +12,7 @@ var clientset *kubernetes.Clientset
 
 func init()  {
 
-	prodconfig := flag.String("prodconfig","/Users/zhouhao/kubeadmin/src/kubeadmin/prod/config","kubernetes config file path")
+	prodconfig := flag.String("prodconfig","/root/pord/config","kubernetes config file path")
 	flag.Parse()
 
 	config , err := clientcmd.BuildConfigFromFlags("",*prodconfig)
