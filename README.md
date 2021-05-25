@@ -1,6 +1,7 @@
 # k8s-Management
 # k8s管理平台
-# kubeadmin是后端接口接口代码，kube-front是前端代码
+# kubeadmin是后端接口接口代码，kube-front是前端代码  
+# kubeadmin 的 prod下面init读取生产的config路径，controller的init文件读取的路径是测试或者研发环境  
 使用方式  
 ## go 1.11+ 如下
 git clone xxxxxx  
