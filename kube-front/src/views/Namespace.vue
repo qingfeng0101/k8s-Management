@@ -1,5 +1,5 @@
 <template>
-<div>
+<div >
   <el-table
     :data=$store.state.Data
     style="width: 100%"
@@ -47,12 +47,23 @@
     </el-table-column>
   </el-table>
   </div>
+  
 </template>
 
 <script>
 export default {
+    data () {
+        return {
+          show: false
+        }
+    },
   mounted () {
-    this.$store.dispatch('Getnamespace')
+      if (this.$store.state.ENV === "test"){
+         this.$store.dispatch('Getdata',"namespace")
+       }else{
+           this.$store.dispatch('Getdata',"prod/namespace")
+       }
+    
   },
   methods: {
     deleteRow (index, rows) {
@@ -61,13 +72,33 @@ export default {
     getpods (index, rows) {
       var namespace = rows[index].name
       localStorage.setItem('namespace', namespace)
-      // this.$store.dispatch('Postpods',namespace)
+      var ENV = localStorage.getItem('ENV')
+      var data = {}
+      if (ENV === "test"){
+          data['url'] = 'pod'
+          data['namespace'] = namespace
+           this.$store.dispatch('Postdata',data)
+      }else{
+           data['url'] = 'prod/pod'
+          data['namespace'] = namespace
+           this.$store.dispatch('Postdata',data)
+      }
       this.$router.push('/pods')
     },
     getdeployment (index, rows) {
       var namespace = rows[index].name
       localStorage.setItem('namespace', namespace)
-      // this.$store.dispatch('Postpods',namespace)
+      var ENV = localStorage.getItem('ENV')
+      var data = {}
+      if (ENV === "test"){
+          data['url'] = 'getdeplyment'
+          data['namespace'] = namespace
+           this.$store.dispatch('Postdata',data)
+      }else{
+           data['url'] = 'prod/getdeplyment'
+          data['namespace'] = namespace
+           this.$store.dispatch('Postdata',data)
+      }
       this.$router.push('/deployment')
     }
 

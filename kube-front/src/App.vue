@@ -1,11 +1,15 @@
 <template>
   <div>
-    <Tabbar v-show="isShowtabelbar"></Tabbar>
+    <Tabbar v-show="isShowtabelbar" ></Tabbar>
     <router-view></router-view>
+       
+   
+     
+   
   </div>
 </template>
 <script>
-import Tabbar from './components/Tabbar'
+import Tabbar from '@/components/Tabbar'
 import { mapState } from 'vuex'
 export default {
   data () {

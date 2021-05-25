@@ -1,4 +1,4 @@
-package controller
+package prod
 
 import (
 	"bufio"
@@ -32,6 +32,7 @@ func Namespace(c *gin.Context)  {
 		return
 	}
 	for _,NsList := range nslist.Items{
+		fmt.Println(NsList.ClusterName)
 		ns.Name = NsList.Name
 		ns.Status = NsList.Status.Phase
         ns.Age = NsList.CreationTimestamp
@@ -114,14 +115,14 @@ func DeletePod(c *gin.Context)  {
 		fmt.Println("pods err: ",err)
 		return
 	}
-	//// 删除后查询pods列表，返回给前端
+	// 删除后查询pods列表，返回给前端
 	pods = clientset.CoreV1().Pods(namespace)
 	ps,err := pods.List(context.TODO(),metav1.ListOptions{})
 	if err != nil{
 		fmt.Println("pods err: ",err)
 		return
 	}
-	//
+
 	for _,p := range ps.Items{
 		fmt.Println(p.Name)
 		fmt.Println(p.Status.Phase,p.OwnerReferences)

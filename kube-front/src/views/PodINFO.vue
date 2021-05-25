@@ -89,12 +89,19 @@ export default {
   mounted () {
     // console.log("mounted data",$store.state.Pods)
     this.$store.commit('hildShowtabbar', false)
+     var ENV = localStorage.getItem('ENV')
     this.namespace = localStorage.getItem('namespace')
     this.podname = localStorage.getItem('podname')
     this.data['name'] = this.podname
     this.data['namespace'] = this.namespace
+    if (ENV === "test"){
+      this.data['url'] = 'getpodinfo'
+    }else{
+      this.data['url'] = 'prod/getpodinfo'
+    }
     this.$store.dispatch('GetPodinfo', this.data)
     // this.$router.push("/pods")
+     
   },
   methods: {
     status (data) {

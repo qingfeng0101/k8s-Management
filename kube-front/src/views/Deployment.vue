@@ -2,7 +2,7 @@
     <div>
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
     <el-tab-pane label="deployments列表" name="deployments">deployments列表</el-tab-pane>
-    <el-tab-pane label="返回" name="namespace">返回</el-tab-pane>
+    <el-tab-pane label="返回" name="Getnamespace">返回</el-tab-pane>
   </el-tabs>
     <el-table
     :data=$store.state.Data
@@ -45,7 +45,6 @@
       width="500">
       <template slot-scope="scope">
         <el-button
-          @click.native.prevent="Delete(scope.$index, $store.state.Data)"
           type="text"
           size="small">
           <el-button type="text" @click="open(scope.$index, $store.state.Data)">删除</el-button>
@@ -97,9 +96,18 @@ export default {
   mounted () {
     this.$store.commit('hildShowtabbar', false)
     // console.log("mounted data",$store.state.Pods)
+    var ENV = localStorage.getItem('ENV')
     this.namespace = localStorage.getItem('namespace')
-    this.$store.dispatch('Postdeployment', this.namespace)
-    // this.$router.push("/pods")
+      var data = {}
+      if (ENV === "test"){
+          data['url'] = 'getdeplyment'
+          data['namespace'] = this.namespace
+           this.$store.dispatch('Postdata',data)
+      }else{
+           data['url'] = 'prod/getdeplyment'
+          data['namespace'] = this.namespace
+           this.$store.dispatch('Postdata',data)
+      }
   },
 
   methods: {
@@ -121,7 +129,12 @@ export default {
       data['name'] = rows[index].name
       data['namespace'] = rows[index].namespace
       data['num'] = this.num
-
+      var ENV = localStorage.getItem('ENV')
+      if (ENV === "test"){
+          data['url'] = 'updatadeployment'
+        }else{
+          data['url'] = 'prod/updatadeployment'
+        }
       this.$store.dispatch('UpdataDeployment', data)
       rows[index].isshow = false
       this.$router.push('/deployment')
@@ -129,19 +142,30 @@ export default {
 
     open (index, rows) {
       this.podname = rows[index].name
-      this.data['name'] = this.podname
-      this.data['namespace'] = this.namespace
+      this.data['name'] = this.podname 
+      this.data['namespace'] = rows[index].namespace
+      var ENV = localStorage.getItem('ENV')
+       if (ENV === "test"){
+          this.data['url'] = 'deletedeployment'
+        }else{
+          this.data['url'] = 'prod/deletedeployment'
+        }
       this.$confirm('是否删除' + rows[index].name, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$store.dispatch('DeleteDeployment', this.data)
+        this.$store.dispatch('DeleteData', this.data)
         this.$message({
           type: 'success',
           message: '删除成功!'
         })
-        this.$store.dispatch('Postpods', this.namespace)
+        if (ENV === "test"){
+          this.data['url'] = 'getdeplyment'
+      }else{
+          this.data['url'] = 'prod/getdeplyment'
+      }
+        this.$store.dispatch('Postdata', this.data)
       }).catch(() => {
         this.$message({
           type: 'info',

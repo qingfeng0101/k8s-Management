@@ -19,7 +19,8 @@ export default {
       count: 0,
       logs: [],
       activeName: 'logs',
-      name: ''
+      name: '',
+      url: ''
     }
   },
   beforeMount () {
@@ -33,6 +34,12 @@ export default {
   },
   mounted () {
     this.$store.commit('hildShowtabbar', false)
+    var ENV = localStorage.getItem('ENV')
+    if (ENV === "test"){
+        this.url = 'getpodlog'
+    }else{
+         this.url = 'prod/getpodlog'
+    }
     var name = localStorage.getItem('name')
     var namespace = localStorage.getItem('namespace')
     this.name = name
@@ -44,8 +51,8 @@ export default {
     this.onClose()
   },
   methods: {
-    initSocket (name, namespace) {
-      const wsUrl = 'ws://192.168.0.105:8080/getpodlog'
+    initSocket () {
+      const wsUrl = `ws://192.168.0.105:8080/${this.url}`
       const ws = new WebSocket(wsUrl)
       this.Socket = ws
       this.Socket.onopen = this.onOpen
@@ -54,7 +61,7 @@ export default {
       this.Socket.onclose = this.onClose
     },
 
-    onOpen (name, namespace) {
+    onOpen () {
       var jsondata = JSON.stringify(this.data)
       this.Socket.send(jsondata)
     },

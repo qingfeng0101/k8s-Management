@@ -29,53 +29,34 @@
       fixed="right"
       label="操作"
       width="300">
-      <!-- <template slot-scope="scope">
-        <el-button
-
-          type="text"
-          size="small">
-          移除
-        </el-button>
-        <el-button
-          @click.native.prevent="getdeployment(scope.$index, $store.state.Data)"
-          type="text"
-          size="small">
-          查看deployment
-        </el-button>
-        <el-button
-          @click.native.prevent="getpods(scope.$index, $store.state.Data)"
-          type="text"
-          size="small">
-          查看pods
-        </el-button>
-      </template> -->
     </el-table-column>
   </el-table>
   </div>
+  <!-- <div v-else>
+     请选择环境
+  </div> -->
 </template>
 <script>
 export default {
+  data() {
+    return {
+      show: false,
+      data: {}
+    }
+  },
+  
   mounted () {
-    this.$store.dispatch('GetHost')
+       if (this.$store.state.ENV === "test"){
+         this.$store.dispatch('Getdata',"nodes")
+       }else{
+         this.$store.dispatch('Getdata',"prod/nodes")
+       }
+       this.data = localStorage.getItem('envinfo')
+       console.log("ENV: ",this.$store.state.ENV)
+       console.log("host: ",this.$store.state.Tabbarname)
+       
+    
+    
   }
-  // methods: {
-  //   deleteRow(index, rows) {
-  //     rows.splice(index, 1);
-  //   },
-  //   getpods(index,rows){
-  //     var namespace = rows[index].name
-  //     localStorage.setItem("namespace",namespace)
-  //     // this.$store.dispatch('Postpods',namespace)
-  //     this.$router.push("/pods")
-  //   },
-  //   getdeployment(index,rows){
-  //     var namespace = rows[index].name
-  //     localStorage.setItem("namespace",namespace)
-  //     // this.$store.dispatch('Postpods',namespace)
-  //     this.$router.push("/deployment")
-  //   }
-
-  // },
-
 }
 </script>
