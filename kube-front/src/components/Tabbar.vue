@@ -17,7 +17,7 @@ export default {
   data () {
     return {
       activeName: this.$store.state.Tabbarname,
-       radio1: 'test',
+       radio1: localStorage.getItem('ENV')||'test',
     }
   },
  mounted () {
@@ -37,21 +37,19 @@ export default {
     },
     changes(){
       this.$store.commit('UpdateENV', this.radio1)
+      var data = {}
       localStorage.setItem('ENV', this.radio1)
       if (this.activeName === "GetHost" ){
-         if (this.radio1 === "test"  ){
-             this.$store.dispatch('Getdata',"nodes")
-        }else{
-            this.$store.dispatch('Getdata',"prod/nodes")
-        }
+        data["env"] = this.radio1
+        data["namespace"] = null
+        data['url'] = '/api/nodes'
+        this.$store.dispatch('Postdata',data)
       }else{
-        if (this.radio1 === "test"  ){
-             this.$store.dispatch('Getdata',"namespace")
-        }else{
-            this.$store.dispatch('Getdata',"prod/namespace")
-        }
+        data["env"] = this.radio1
+        data["namespace"] = null
+        data['url'] = '/api/namespace'
+        this.$store.dispatch('Postdata',data)
       }
-      
       this.$router.push(this.activeName)
       console.log("label: ",this.radio1)
     }

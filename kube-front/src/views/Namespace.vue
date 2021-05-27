@@ -58,11 +58,17 @@ export default {
         }
     },
   mounted () {
-      if (this.$store.state.ENV === "test"){
-         this.$store.dispatch('Getdata',"namespace")
-       }else{
-           this.$store.dispatch('Getdata',"prod/namespace")
-       }
+      var data = {}
+      data["env"] = localStorage.getItem('ENV')
+      data["namespace"] = null
+      data['url'] = '/api/namespace'
+      data['name'] = 'null'
+      this.$store.dispatch('Postdata',data)
+    //   if (this.$store.state.ENV === "test"){
+    //      this.$store.dispatch('Getdata',"namespace")
+    //    }else{
+    //        this.$store.dispatch('Getdata',"prod/namespace")
+    //    }
     
   },
   methods: {
@@ -72,36 +78,23 @@ export default {
     getpods (index, rows) {
       var namespace = rows[index].name
       localStorage.setItem('namespace', namespace)
-      var ENV = localStorage.getItem('ENV')
       var data = {}
-      if (ENV === "test"){
-          data['url'] = 'pod'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata',data)
-      }else{
-           data['url'] = 'prod/pod'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata',data)
-      }
+       data['url'] = '/api/pod'
+       data['namespace'] = namespace
+       data["env"] = localStorage.getItem('ENV')
+       this.$store.dispatch('Postdata',data)
       this.$router.push('/pods')
-    },
+      },
     getdeployment (index, rows) {
-      var namespace = rows[index].name
+        var namespace = rows[index].name
       localStorage.setItem('namespace', namespace)
-      var ENV = localStorage.getItem('ENV')
       var data = {}
-      if (ENV === "test"){
-          data['url'] = 'getdeplyment'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata',data)
-      }else{
-           data['url'] = 'prod/getdeplyment'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata',data)
-      }
+       data['url'] = '/api/getdeplyment'
+       data['namespace'] = namespace
+       data["env"] = localStorage.getItem('ENV')
+       this.$store.dispatch('Postdata',data)
       this.$router.push('/deployment')
     }
-
   }
 
 }

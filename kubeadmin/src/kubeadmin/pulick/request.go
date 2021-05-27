@@ -5,7 +5,6 @@ import (
 )
 
 func Get(c *gin.Context, namespacelist interface{})  {
-
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

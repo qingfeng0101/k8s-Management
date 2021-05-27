@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        Tabbarname: localStorage.getItem('activeName') || 'host',
+        Tabbarname: localStorage.getItem('activeName') || 'GetHost',
         Data: [],
         Nodes: [],
         Pods: [],
@@ -24,7 +24,11 @@ export default new Vuex.Store({
             console.log("state", state.ENV)
         },
         Updata(state, data) {
-            state.Data = data
+            if (data === null) {
+                state.Data = []
+            } else {
+                state.Data = data
+            }
         },
         UpdatePod(state, data) {
             state.Pod = data
@@ -38,19 +42,15 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        Getdata(state, data) {
-            axios({
-                url: `http://192.168.0.105:8080/${data}`
-            }).then(res => {
-                state.commit('Updata', res.data.message)
-            })
-        },
         Postdata(state, data) {
             axios({
-                url: `http://192.168.0.105:8080/${data.url}`,
+                url: `http://192.168.0.105:8080${data.url}`,
                 method: 'POST',
                 data: {
-                    'namespace': data.namespace
+                    'name': data.name,
+                    'namespace': data.namespace,
+                    'env': data.env,
+                    'num': data.num
                 },
                 transformRequest: [function(data) {
                     // Do whatever you want to transform the data
@@ -77,7 +77,8 @@ export default new Vuex.Store({
                 method: 'POST',
                 data: {
                     'name': data.name,
-                    'namespace': data.namespace
+                    'namespace': data.namespace,
+                    'env': data.env
                 },
                 transformRequest: [function(data) {
                     // Do whatever you want to transform the data
@@ -97,11 +98,12 @@ export default new Vuex.Store({
         },
         GetPodinfo(state, data) {
             axios({
-                url: `http://192.168.0.105:8080/${data.url}`,
+                url: `http://192.168.0.105:8080${data.url}`,
                 method: 'POST',
                 data: {
                     'name': data.name,
-                    'namespace': data.namespace
+                    'namespace': data.namespace,
+                    'env': data.env
                 },
                 transformRequest: [function(data) {
                     // Do whatever you want to transform the data
