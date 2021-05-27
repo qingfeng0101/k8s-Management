@@ -46,17 +46,11 @@ export default {
   },
   
   mounted () {
-       if (this.$store.state.ENV === "test"){
-         this.$store.dispatch('Getdata',"nodes")
-       }else{
-         this.$store.dispatch('Getdata',"prod/nodes")
-       }
-       this.data = localStorage.getItem('envinfo')
-       console.log("ENV: ",this.$store.state.ENV)
-       console.log("host: ",this.$store.state.Tabbarname)
-       
-    
-    
+      this.data["env"] = localStorage.getItem('ENV')
+      this.data["namespace"] = null
+      this.data['url'] = '/api/nodes'
+      this.data['name'] = 'null'
+      this.$store.dispatch('Postdata',this.data)
   }
 }
 </script>

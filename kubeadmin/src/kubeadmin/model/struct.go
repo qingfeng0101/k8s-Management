@@ -46,6 +46,7 @@ type Message struct {
 	Name  string `json:"name"`
 	Namespace string `json:"namespace"`
 	Cname string `json:"cname"`
+	ENV string `json:"env"`
 }
 type Deployment struct {
 	NAME string `json:"name"`

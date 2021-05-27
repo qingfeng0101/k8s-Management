@@ -65,7 +65,6 @@
       </template>
     </el-table-column>
   </el-table>
-
   </div>
 </template>
 <script>
@@ -75,6 +74,7 @@ export default {
       namespace: '',
       activeName: 'pods',
       podname: 'test',
+      pods: [],
       data: {}
     }
   },
@@ -89,18 +89,13 @@ export default {
   },
   mounted () {
     this.$store.commit('hildShowtabbar', false)
-    var ENV = localStorage.getItem('ENV')
     var namespace = localStorage.getItem('namespace')
-      var data = {}
-      if (ENV === "test"){
-          data['url'] = 'pod'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata', data)
-      }else{
-           data['url'] = 'prod/pod'
-          data['namespace'] = namespace
-           this.$store.dispatch('Postdata', data)
-      }
+    var data = {}
+    data['env']= localStorage.getItem('ENV')
+    data['url'] = '/api/pod'
+    data['namespace'] = namespace
+    this.$store.dispatch('Postdata', data)
+      
   },
 
   methods: {
@@ -108,31 +103,21 @@ export default {
       console.log(index)
     },
     open (index, rows) {
-      var ENV = localStorage.getItem('ENV')
-      var namespace = localStorage.getItem('namespace')
-      if (ENV === "test"){
-          this.data['url'] = 'deletepod'
-        }else{
-          this.data['url'] = 'prod/deletepod'
-        }
-      this.podname = rows[index].name
-      this.data['name'] = this.podname
-      this.data['namespace'] = namespace
+      this.data['env'] = localStorage.getItem('ENV')
+      this.data['url'] = '/api/deletepod'
+      this.data['name'] = rows[index].name
+      this.data['namespace'] = rows[index].namespace
       this.$confirm('是否删除' + rows[index].name, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$store.dispatch('DeleteData', this.data)
+        this.$store.dispatch('Postdata', this.data)
         this.$message({
           type: 'success',
           message: '删除成功!'
         })
-        if (ENV === "test"){
-          this.data['url'] = 'pod'
-      }else{
-          this.data['url'] = 'prod/pod'
-      }
+        this.data['url'] = '/api/pod'
         this.$store.dispatch('Postdata', this.data)
       }).catch(() => {
         this.$message({

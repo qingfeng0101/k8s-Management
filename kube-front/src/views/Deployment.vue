@@ -98,16 +98,10 @@ export default {
     // console.log("mounted data",$store.state.Pods)
     var ENV = localStorage.getItem('ENV')
     this.namespace = localStorage.getItem('namespace')
-      var data = {}
-      if (ENV === "test"){
-          data['url'] = 'getdeplyment'
-          data['namespace'] = this.namespace
-           this.$store.dispatch('Postdata',data)
-      }else{
-           data['url'] = 'prod/getdeplyment'
-          data['namespace'] = this.namespace
-           this.$store.dispatch('Postdata',data)
-      }
+      this.data['url'] = '/api/getdeplyment'
+       this.data['namespace'] = this.namespace
+       this.data["env"] = localStorage.getItem('ENV')
+       this.$store.dispatch('Postdata',this.data)
   },
 
   methods: {
@@ -126,45 +120,30 @@ export default {
     OK (index, rows) {
       console.log('OK: ', this.num)
       var data = {}
+      data["env"] = localStorage.getItem('ENV')
       data['name'] = rows[index].name
       data['namespace'] = rows[index].namespace
       data['num'] = this.num
-      var ENV = localStorage.getItem('ENV')
-      if (ENV === "test"){
-          data['url'] = 'updatadeployment'
-        }else{
-          data['url'] = 'prod/updatadeployment'
-        }
-      this.$store.dispatch('UpdataDeployment', data)
+      data['url'] = '/api/updatadeployment'
+      this.$store.dispatch('Postdata', data)
       rows[index].isshow = false
-      this.$router.push('/deployment')
     },
-
     open (index, rows) {
-      this.podname = rows[index].name
-      this.data['name'] = this.podname 
+      this.data['env'] = localStorage.getItem('ENV')
+      this.data['url'] = '/api/deletedeployment'
+      this.data['name'] = rows[index].name
       this.data['namespace'] = rows[index].namespace
-      var ENV = localStorage.getItem('ENV')
-       if (ENV === "test"){
-          this.data['url'] = 'deletedeployment'
-        }else{
-          this.data['url'] = 'prod/deletedeployment'
-        }
       this.$confirm('是否删除' + rows[index].name, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$store.dispatch('DeleteData', this.data)
+        this.$store.dispatch('Postdata', this.data)
         this.$message({
           type: 'success',
           message: '删除成功!'
         })
-        if (ENV === "test"){
-          this.data['url'] = 'getdeplyment'
-      }else{
-          this.data['url'] = 'prod/getdeplyment'
-      }
+        this.data['url'] = '/api/getdeplyment'
         this.$store.dispatch('Postdata', this.data)
       }).catch(() => {
         this.$message({

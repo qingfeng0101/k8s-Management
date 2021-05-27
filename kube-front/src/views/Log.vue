@@ -34,25 +34,21 @@ export default {
   },
   mounted () {
     this.$store.commit('hildShowtabbar', false)
-    var ENV = localStorage.getItem('ENV')
-    if (ENV === "test"){
-        this.url = 'getpodlog'
-    }else{
-         this.url = 'prod/getpodlog'
-    }
+    this.data["env"] = localStorage.getItem('ENV')
     var name = localStorage.getItem('name')
     var namespace = localStorage.getItem('namespace')
     this.name = name
     this.data['name'] = name
     this.data['namespace'] = namespace
-    this.initSocket(name, namespace)
+    this.data['url'] = '/api/getpodlog'
+    this.initSocket()
   },
   destroyed: function () {
     this.onClose()
   },
   methods: {
     initSocket () {
-      const wsUrl = `ws://192.168.0.105:8080/${this.url}`
+      const wsUrl = `ws://192.168.0.105:8080${this.data.url}`
       const ws = new WebSocket(wsUrl)
       this.Socket = ws
       this.Socket.onopen = this.onOpen
