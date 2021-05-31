@@ -127,9 +127,16 @@ func GetPodlog(c *gin.Context)  {
 		return
 	}
 	defer ws.Close()
+	statsus := make(chan bool)
+	//ctx, stop := context.WithCancel(context.Background())
 	for {
+
 		mt, message, err := ws.ReadMessage()
 		if err != nil {
+			fmt.Println("ReadMessage: ",err)
+			fmt.Println("################################################")
+			statsus <- false
+			//stop()
 			break
 		}
 		 var mess  model.Message
@@ -141,11 +148,12 @@ func GetPodlog(c *gin.Context)  {
 			return
 		}
 		fmt.Println(mess)
+		fmt.Println("第一层： ",mess.Status)
 		switch {
 		case mess.ENV == "test":
-			pulick.PodLogs(ws, mt, clientset, mess.Name, mess.Namespace)
+			go pulick.PodLogs(ws, mt, clientset, mess.Name, mess.Namespace,statsus )
 		case mess.ENV == "prod":
-			pulick.PodLogs(ws, mt, prodclientset, mess.Name, mess.Namespace)
+			go pulick.PodLogs(ws, mt, prodclientset, mess.Name, mess.Namespace,statsus)
 		}
 	}
 }

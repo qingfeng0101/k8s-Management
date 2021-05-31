@@ -28,7 +28,7 @@ func init()  {
 		fmt.Println("connect k8s success")
 	}
 	// 通过读取线上的config文件生成clientset
-	prodconfig := flag.String("prodconfig","/Users/zhouhao/kubeadmin/src/kubeadmin/prod/config","kubernetes config file path")
+	prodconfig := flag.String("prodconfig","/Users/zhouhao/prod/config","kubernetes config file path")
 	flag.Parse()
 
 	pconfig , err := clientcmd.BuildConfigFromFlags("",*prodconfig)
