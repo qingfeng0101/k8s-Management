@@ -124,7 +124,7 @@ func Nodes(clientset *kubernetes.Clientset) ([]model.Node,error) {
 	}
 	return NodeList,nil
 }
-func PodLogs(ws *websocket.Conn,mt int,clientset *kubernetes.Clientset,name,namespace string)  {
+func PodLogs(ws *websocket.Conn,mt int,clientset *kubernetes.Clientset,name,namespace string,status chan bool)  {
 	var lines int64
 	lines = 100
 	pods := clientset.CoreV1().Pods(namespace)
@@ -137,21 +137,35 @@ func PodLogs(ws *websocket.Conn,mt int,clientset *kubernetes.Clientset,name,name
 	}
 	r := bufio.NewReader(log)
 	for {
-		bytes, err := r.ReadBytes('\n')
+		fmt.Println("输入1")
+		select {
 
-		fmt.Println(string(bytes))
-		err = ws.WriteMessage(mt, bytes)
-		if err != nil {
-			break
-		}
+		case <- status:
+			fmt.Println("退出")
+			return
+		default:
+			//fmt.Println("第二层",mess.Status)
 
-		//Get(c,string(bytes))
-		if err != nil {
-			if err != io.EOF {
-				fmt.Println("err: ", err)
+			bytes, err := r.ReadBytes('\n')
+			//fmt.Println("第二层 ",status)
+			//fmt.Println(string(bytes))
+			//fmt.Println("********************************************************************")
+			err = ws.WriteMessage(mt, bytes)
+			if err != nil {
+				break
+			}
+
+
+
+
+			//Get(c,string(bytes))
+			if err != nil {
+				if err != io.EOF {
+					fmt.Println("err: ", err)
+					return
+				}
 				return
 			}
-			return
 		}
 	}
 }
