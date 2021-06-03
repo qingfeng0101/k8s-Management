@@ -1,7 +1,7 @@
 <template>
-<div >
+<div v-if="show">
   <el-table
-    :data=$store.state.Data
+    :data=Data
     style="width: 100%"
     max-height="800px">
     <el-table-column
@@ -47,23 +47,39 @@
     </el-table-column>
   </el-table>
   </div>
-  
+  <div v-else>
+    请添加环境
+  </div> 
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     data () {
         return {
-          show: false
+          //show: true,
         }
     },
+    computed: {
+    ...mapState(['Data','show','ENV'])
+  },
   mounted () {
+    var show = localStorage.getItem('show')
+    if (show == "true"){
+          show = true
+        }else{
+          show = false
+        }
+    this.$store.commit('hildshow', show)
+    this.$store.commit('UpdateENV', localStorage.getItem('env'))
+    if (this.show){
       var data = {}
-      data["env"] = localStorage.getItem('ENV')
+      data["env"] = this.ENV
       data["namespace"] = null
       data['url'] = '/api/namespace'
       data['name'] = 'null'
       this.$store.dispatch('Postdata',data)
+      }
     //   if (this.$store.state.ENV === "test"){
     //      this.$store.dispatch('Getdata',"namespace")
     //    }else{
@@ -81,7 +97,7 @@ export default {
       var data = {}
        data['url'] = '/api/pod'
        data['namespace'] = namespace
-       data["env"] = localStorage.getItem('ENV')
+       data["env"] = this.ENV
        this.$store.dispatch('Postdata',data)
       this.$router.push('/pods')
       },
@@ -91,7 +107,7 @@ export default {
       var data = {}
        data['url'] = '/api/getdeplyment'
        data['namespace'] = namespace
-       data["env"] = localStorage.getItem('ENV')
+       data["env"] = this.ENV
        this.$store.dispatch('Postdata',data)
       this.$router.push('/deployment')
     }

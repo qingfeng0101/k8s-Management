@@ -5,7 +5,7 @@
     <el-tab-pane label="返回" name="Getnamespace">返回</el-tab-pane>
   </el-tabs>
   <el-table
-    :data=$store.state.Data
+    :data=Data
     style="width: 100%"
     max-height="800">
     <el-table-column
@@ -45,19 +45,19 @@
       width="300">
       <template slot-scope="scope">
         <el-button
-        @click.native.prevent="Delete(scope.$index, $store.state.Data)"
+        @click.native.prevent="Delete(scope.$index, Data)"
           type="text"
           size="small">
-          <el-button type="text" @click="open(scope.$index, $store.state.Data)">删除</el-button>
+          <el-button type="text" @click="open(scope.$index, Data)">删除</el-button>
         </el-button>
         <el-button
-          @click.native.prevent="Podinfo(scope.$index, $store.state.Data)"
+          @click.native.prevent="Podinfo(scope.$index, Data)"
           type="text"
           size="small">
           查看pod详情
         </el-button>
         <el-button
-          @click.native.prevent="GetPodLog(scope.$index, $store.state.Data)"
+          @click.native.prevent="GetPodLog(scope.$index, Data)"
           type="text"
           size="small">
           查看pod日志
@@ -68,6 +68,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -77,6 +78,9 @@ export default {
       pods: [],
       data: {}
     }
+  },
+  computed: {
+    ...mapState(['Data'])
   },
   beforeMount () {
     // bus.$emit('maizuo', false)
@@ -127,7 +131,7 @@ export default {
       })
     },
     Podinfo (index, rows) {
-      
+      console.log("rows: ",rows)
       this.podname = rows[index].name
       this.data['name'] = this.podname
       this.data['namespace'] = rows[index].namespace

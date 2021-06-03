@@ -1,0 +1,6 @@
+# 后端服务监听的IP
+ip: 0.0.0.0
+# 后端服务监听的端口
+port: 8080
+# 指定用户上传的config目录
+path: /Users/zhouhao/download

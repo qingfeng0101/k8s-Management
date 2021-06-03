@@ -137,11 +137,11 @@ func PodLogs(ws *websocket.Conn,mt int,clientset *kubernetes.Clientset,name,name
 	}
 	r := bufio.NewReader(log)
 	for {
-		fmt.Println("输入1")
+
 		select {
 
 		case <- status:
-			fmt.Println("退出")
+
 			return
 		default:
 			//fmt.Println("第二层",mess.Status)

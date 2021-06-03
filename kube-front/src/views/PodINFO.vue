@@ -9,22 +9,22 @@
 <span>
       <tr >
         <td >Name</td>
-        <td >{{$store.state.Pod.name}}</td>
+        <td >{{Pod.name}}</td>
       </tr>
       <tr >
         <td ><pre>Namespace    </pre></td>
-        <td >{{$store.state.Pod.namespace}}</td>
+        <td >{{Pod.namespace}}</td>
       </tr>
       <tr >
         <td >Labels</td>
         <td >
-        <span v-for="(label,key) in $store.state.Pod.labels" :key=key>
+        <span v-for="(label,key) in Pod.labels" :key=key>
         {{key}} = {{label}}
         </span>
         </td>
       </tr>
     </span>
-    <span   v-for="(Container,index) in $store.state.Pod.containers" :key=index>
+    <span   v-for="(Container,index) in Pod.containers" :key=index>
       <tr >
         <td >Container Name</td>
         <td >{{Container.Name}}</td>
@@ -68,6 +68,7 @@
 
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -85,6 +86,9 @@ export default {
   beforeDestroy () {
     // this.$store.state.isShowtabelbar = true
     this.$store.commit('Showtabbar', true)
+  },
+  computed: {
+    ...mapState(['Pod'])
   },
   mounted () {
     // console.log("mounted data",$store.state.Pods)

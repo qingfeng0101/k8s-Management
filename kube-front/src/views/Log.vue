@@ -41,6 +41,7 @@ export default {
     this.data['name'] = name
     this.data['namespace'] = namespace
     this.data['url'] = '/api/getpodlog'
+    this.data['status'] = 'true'
     this.initSocket()
   },
   destroyed: function () {
@@ -48,7 +49,7 @@ export default {
   },
   methods: {
     initSocket () {
-      const wsUrl = `ws://192.168.0.105:8080${this.data.url}`
+      const wsUrl = `ws://127.0.0.1:8080${this.data.url}`
       const ws = new WebSocket(wsUrl)
       this.Socket = ws
       this.Socket.onopen = this.onOpen

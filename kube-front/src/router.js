@@ -6,6 +6,7 @@ import Log from './views/Log'
 import Namespace from './views/Namespace'
 import Host from './views/Host'
 import Deployment from './views/Deployment'
+import Uploadenv from './views/Uploadenv'
 const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err)
@@ -51,6 +52,11 @@ export default new Router({
             path: '/logs',
             name: 'Log',
             component: Log
+        },
+        {
+            path: '/uploadenv',
+            name: 'Uploadenv',
+            component: Uploadenv
         }
 
     ]

@@ -5,10 +5,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        Tabbarname: localStorage.getItem('activeName') || 'GetHost',
+        Tabbarname: 'GetHost',
         Data: [],
-        Nodes: [],
-        Pods: [],
+        isshow: true,
+        show: true,
+        Env: [],
         Pod: {},
         Deplyment: [],
         isShowtabelbar: true,
@@ -17,11 +18,10 @@ export default new Vuex.Store({
     mutations: {
         UpdateTabbarname(state, data) {
             state.Tabbarname = data
-            console.log("state", state.Tabbarname)
         },
         UpdateENV(state, data) {
             state.ENV = data
-            console.log("state", state.ENV)
+            console.log("ENV: ", state.ENV)
         },
         Updata(state, data) {
             if (data === null) {
@@ -33,18 +33,29 @@ export default new Vuex.Store({
         UpdatePod(state, data) {
             state.Pod = data
         },
+        Updateenv(state, data) {
+            state.Env = data
+        },
         hildShowtabbar(state, data) {
             state.isShowtabelbar = data
             console.log(state.isShowtabelbar)
         },
         Showtabbar(state, data) {
             state.isShowtabelbar = data
+        },
+        hildShow(state, data) {
+            state.isshow = data
+            console.log("sishow: ", state.isshow)
+        },
+        hildshow(state, data) {
+            state.show = data
+            console.log("show: ", state.show)
         }
     },
     actions: {
         Postdata(state, data) {
             axios({
-                url: `http://192.168.0.105:8080${data.url}`,
+                url: `http://127.0.0.1:8080${data.url}`,
                 method: 'POST',
                 data: {
                     'name': data.name,
@@ -73,7 +84,7 @@ export default new Vuex.Store({
         DeleteData(state, data) {
             console.log("delete data: ", data)
             axios({
-                url: `http://192.168.0.105:8080/${data.url}`,
+                url: `http://127.0.0.1:8080/${data.url}`,
                 method: 'POST',
                 data: {
                     'name': data.name,
@@ -98,7 +109,7 @@ export default new Vuex.Store({
         },
         GetPodinfo(state, data) {
             axios({
-                url: `http://192.168.0.105:8080${data.url}`,
+                url: `http://127.0.0.1:8080${data.url}`,
                 method: 'POST',
                 data: {
                     'name': data.name,
@@ -121,35 +132,44 @@ export default new Vuex.Store({
                 state.commit('UpdatePod', res.data.message)
             })
         },
-        DeleteDeployment(state, data) {
-            console.log(data.name, data.namespace)
+        Uploadenv(state, data) {
+            let param = new FormData()
+            console.log("data: ", data.data)
+            param.append('files', data.data.file)
+            param.append('testname', data.name)
+                // axios.post(`http://192.168.0.105:8080${data.url}`, data).then(res => {
+                //     console.log(res)
+                // })
             axios({
-                url: 'http://192.168.0.105:8080/deletedeployment',
-                method: 'POST',
-                data: {
-                    'name': data.name,
-                    'namespace': data.namespace
-                },
-                transformRequest: [function(data) {
-                    // Do whatever you want to transform the data
-                    let ret = ''
-                    for (let it in data) {
-                        // 如果要发送中文 编码
-                        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-                    }
-                    return ret
-                }],
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                method: 'post',
+                url: `http://127.0.0.1:8080${data.url}`,
+                headers: { 'Content-Type': 'multipart/form-data' },
+                data: param
             }).then(res => {
-                state.commit('Updata', res.data.message)
+                state.commit('Updateenv', res.data.message)
+            })
+        },
+        Getenv(state, data) {
+            // axios.post(`http://192.168.0.105:8080${data.url}`, data).then(res => {
+            //     console.log(res)
+            // })
+            axios({
+                method: 'get',
+                url: `http://127.0.0.1:8080${data.url}`,
+            }).then(res => {
+                console.log('Updateenv: ', res.data.message)
+                if (res.data.message === null) {
+                    return
+                } else {
+                    state.commit('Updateenv', res.data.message)
+                }
+
             })
         },
         UpdataDeployment(state, data) {
             console.log(data.name, data.namespace)
             axios({
-                url: `http://192.168.0.105:8080/${data.url}`,
+                url: `http://127.0.0.1:8080/${data.url}`,
                 method: 'POST',
                 data: {
                     'name': data.name,

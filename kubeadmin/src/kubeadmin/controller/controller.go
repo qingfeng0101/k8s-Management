@@ -8,6 +8,8 @@ import (
 	"kubeadmin/model"
 	"kubeadmin/pulick"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -19,106 +21,74 @@ var upGrader = websocket.Upgrader{
 
 func Namespace(c *gin.Context)  {
 	ENV := c.PostForm("env")
-	switch  {
-	case ENV == "test":
-		namespacelist,err:=pulick.NamespaceList(clientset)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,namespacelist)
-	case ENV == "prod":
-		namespacelist,err:=pulick.NamespaceList(prodclientset)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,namespacelist)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
 	}
+	namespacelist,err:=pulick.NamespaceList(clientset)
+	if err != nil{
+		fmt.Println("namespace err: ",err)
+		return
+	}
+	pulick.Get(c,namespacelist)
+
 }
 func Pod(c *gin.Context)  {
 	ENV := c.PostForm("env")
 	ns := c.PostForm("namespace")
-	switch  {
-	case ENV == "test":
-		pods,err:=pulick.Pods(clientset,ns)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,pods)
-	case ENV == "prod":
-		pods,err:=pulick.Pods(prodclientset,ns)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,pods)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
 	}
-
-
+	pods,err:=pulick.Pods(clientset,ns)
+	if err != nil{
+		fmt.Println("namespace err: ",err)
+		return
+	}
+	pulick.Get(c,pods)
 }
 
 func DeletePod(c *gin.Context)  {
 	ENV := c.PostForm("env")
 	name := c.PostForm("name")
 	namespace := c.PostForm("namespace")
-	switch  {
-	case ENV == "test":
-		OK,err:=pulick.DeletePod(clientset,name,namespace)
-		if err != nil{
-			fmt.Println("DeletePod err: ",err)
-			return
-		}
-		if OK{
-			// 删除成功后查询返回给前端
-			pods,err := pulick.Pods(clientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,pods)
-		}
-	case ENV == "prod":
-		OK,err:=pulick.DeletePod(prodclientset,name,namespace)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		if OK{
-			pods,err := pulick.Pods(prodclientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,pods)
-		}
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
 	}
-
-
+	OK,err:=pulick.DeletePod(clientset,name,namespace)
+	if err != nil{
+		fmt.Println("DeletePod err: ",err)
+		return
+	}
+	if OK{
+		// 删除成功后查询返回给前端
+		pods,err := pulick.Pods(clientset,namespace)
+		if err != nil{
+			fmt.Println("Pods err: ",err)
+			return
+		}
+		pulick.Get(c,pods)
+	}
 }
 func GetPodInfo(c *gin.Context)  {
 	ENV := c.PostForm("env")
 	name := c.PostForm("name")
 	namespace := c.PostForm("namespace")
-	switch  {
-	case ENV == "test":
-		podinfo,err:=pulick.PodINFO(clientset,name,namespace)
-		if err != nil{
-			fmt.Println("PodINFO err: ",err)
-			return
-		}
-		pulick.Get(c,podinfo)
-	case ENV == "prod":
-		podinfo,err:=pulick.PodINFO(prodclientset,name,namespace)
-		if err != nil{
-			fmt.Println("PodINFO err: ",err)
-			return
-		}
-		pulick.Get(c,podinfo)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
 	}
-
-
+	podinfo,err:=pulick.PodINFO(clientset,name,namespace)
+	if err != nil{
+		fmt.Println("PodINFO err: ",err)
+		return
+	}
+	pulick.Get(c,podinfo)
 }
 func GetPodlog(c *gin.Context)  {
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
@@ -149,69 +119,51 @@ func GetPodlog(c *gin.Context)  {
 		}
 		fmt.Println(mess)
 		fmt.Println("第一层： ",mess.Status)
-		switch {
-		case mess.ENV == "test":
-			go pulick.PodLogs(ws, mt, clientset, mess.Name, mess.Namespace,statsus )
-		case mess.ENV == "prod":
-			go pulick.PodLogs(ws, mt, prodclientset, mess.Name, mess.Namespace,statsus)
+		clientset,OK := clientsetmap[mess.ENV]
+		if !OK{
+			fmt.Println("当前环境不存在")
+			return
 		}
+		go pulick.PodLogs(ws, mt, clientset, mess.Name, mess.Namespace,statsus )
 	}
 }
 func Getdeployment(c *gin.Context)  {
 	ENV := c.PostForm("env")
 	ns := c.PostForm("namespace")
-	switch  {
-	case ENV == "test":
-		DPList,err:=pulick.Deploymnet(clientset,ns)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,DPList)
-	case ENV == "prod":
-		DPList,err:=pulick.Deploymnet(prodclientset,ns)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,DPList)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
 	}
-
+	DPList,err:=pulick.Deploymnet(clientset,ns)
+	if err != nil{
+		fmt.Println("namespace err: ",err)
+		return
+	}
+	pulick.Get(c,DPList)
 }
 func DeleteDeployment(c *gin.Context)  {
 	ENV := c.PostForm("env")
 	name := c.PostForm("name")
 	namespace := c.PostForm("namespace")
-	switch  {
-	case ENV == "test":
-		OK,err:=pulick.DeleteDeployment(clientset,name,namespace)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
+	}
+	OK,err:=pulick.DeleteDeployment(clientset,name,namespace)
+	if err != nil{
+		fmt.Println("DeletePod err: ",err)
+		return
+	}
+	if OK{
+		// 删除成功后查询返回给前端
+		deployments,err := pulick.Deploymnet(clientset,namespace)
 		if err != nil{
-			fmt.Println("DeletePod err: ",err)
+			fmt.Println("Pods err: ",err)
 			return
 		}
-		if OK{
-			// 删除成功后查询返回给前端
-			deployments,err := pulick.Deploymnet(clientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,deployments)
-		}
-	case ENV == "prod":
-		OK,err:=pulick.DeleteDeployment(prodclientset,name,namespace)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		if OK{
-			deployments,err := pulick.Deploymnet(prodclientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,deployments)
-		}
+		pulick.Get(c,deployments)
 	}
 
 }
@@ -223,54 +175,79 @@ func UpdataDeployment(c *gin.Context)  {
 	n,_ := strconv.Atoi(num)
 	dnum := int32(n)
 	// 扩缩容操作
-	switch  {
-	case ENV == "test":
-		OK,err:=pulick.UpDeployment(clientset,name,namespace,&dnum)
+	clientset,OK := clientsetmap[ENV]
+	if !OK{
+		fmt.Println("当前环境不存在")
+		return
+	}
+	OK,err:=pulick.UpDeployment(clientset,name,namespace,&dnum)
+	if err != nil{
+		fmt.Println("DeletePod err: ",err)
+		return
+	}
+	if OK{
+		// 扩缩容成功后查询返回给前端
+		deployments,err := pulick.Deploymnet(clientset,namespace)
 		if err != nil{
-			fmt.Println("DeletePod err: ",err)
+			fmt.Println("Pods err: ",err)
 			return
 		}
-		if OK{
-			// 扩缩容成功后查询返回给前端
-			deployments,err := pulick.Deploymnet(clientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,deployments)
-		}
-	case ENV == "prod":
-		OK,err:=pulick.UpDeployment(prodclientset,name,namespace,&dnum)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		if OK{
-			deployments,err := pulick.Deploymnet(prodclientset,namespace)
-			if err != nil{
-				fmt.Println("Pods err: ",err)
-				return
-			}
-			pulick.Get(c,deployments)
-		}
+		pulick.Get(c,deployments)
 	}
 }
 func GetNode(c *gin.Context)  {
 	ENV := c.PostForm("env")
-	switch  {
-	case ENV == "test":
-		nodes,err:=pulick.Nodes(clientset)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,nodes)
-	case ENV == "prod":
-		nodes,err:=pulick.Nodes(prodclientset)
-		if err != nil{
-			fmt.Println("namespace err: ",err)
-			return
-		}
-		pulick.Get(c,nodes)
+	clientset,_ := clientsetmap[ENV]
+	nodes,err:=pulick.Nodes(clientset)
+	if err != nil{
+		fmt.Println("Nodes err: ",err)
+		return
 	}
+	pulick.Get(c,nodes)
+}
+
+func Upload(c *gin.Context)  {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+	c.Header("Access-Control-Allow-Credentials", "true")
+	name := c.PostForm("testname")
+	fmt.Println("name: ",name)
+	file, err := c.FormFile("files")
+	if err != nil{
+		fmt.Println("err: ",err)
+		return
+	}
+	fmt.Println("file: ",file)
+	dst := fmt.Sprintf("%s/%s", Conf.Path, name)
+	c.SaveUploadedFile(file, dst)
+	Addclientsetmap(name,dst)
+	Getnames(c)
+
+}
+func Getnames(c *gin.Context)  {
+	var names []model.Env
+	env := model.Env{}
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+	c.Header("Access-Control-Allow-Credentials", "true")
+	filepath.Walk(Conf.Path, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			fmt.Println("path: ",path)
+			env.Name = info.Name()
+			env.Url = info.Name()
+			names = append(names, env)
+		}
+		return nil
+	})
+	pulick.Get(c,names)
+}
+func Delnames(c *gin.Context)  {
+	name := c.PostForm("name")
+	dst := fmt.Sprintf("%s/%s", Conf.Path, name)
+	Delclientsetmap(name,dst)
+	Getnames(c)
 }
