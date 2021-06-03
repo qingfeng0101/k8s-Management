@@ -53,13 +53,13 @@ nginx代理配置：
       proxy_set_header Connection $connection_upgrade;  
         proxy_pass http://127.0.0.1:8080;  
     }  
-前端:  
-需要先安装npm这里请自行百度安装  
-安装npm之后为了下载依赖包方便安装cnpm
-npm install -g cnpm --registry=https://registry.npm.taobao.org
-安装cnpm之后执行下面命令，下载需要的依赖包
-cnpm install
-这里在编译前端项目之前请根据情况自行修改下面文件后进行编译  
-store.js还有views/Log.vue,这两个文件里面配置了连接后端的ip和端口，这里根据情况自行修改，用ngixn代理后端的修改为NGINX地址
-npm build   
-然后把dist目录部署到NGINX下即可  
+前端:    
+需要先安装npm这里请自行百度安装    
+安装npm之后为了下载依赖包方便安装cnpm  
+npm install -g cnpm --registry=https://registry.npm.taobao.org  
+安装cnpm之后执行下面命令，下载需要的依赖包  
+cnpm install  
+这里在编译前端项目之前请根据情况自行修改下面文件后进行编译    
+store.js还有views/Log.vue,这两个文件里面配置了连接后端的ip和端口，这里根据情况自行修改，用ngixn代理后端的修改为NGINX地址  
+npm build     
+然后把dist目录部署到NGINX下即可    
