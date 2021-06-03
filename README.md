@@ -27,7 +27,7 @@ config.yaml为配置文件模板
 后端默认端口：8080，  
 nginx代理配置：   
                                                                      
-location / {    
+    location / {    
       root   /usr/share/nginx/html/;    
       index  index.html index.htm;              
       try_files $uri $uri/ /index.html;       
