@@ -28,12 +28,12 @@ config.yaml为配置文件模板
 nginx代理配置：   
                                                                      
 location / {    
-        root   /usr/share/nginx/html/;    
-        index  index.html index.htm;    
-        try_files $uri $uri/ /index.html;    
-    }    
-    location /api {    
-      proxy_read_timeout 300s;    
+      root   /usr/share/nginx/html/;    
+      index  index.html index.htm;              
+      try_files $uri $uri/ /index.html;       
+    }                               
+    location /api {                 
+      proxy_read_timeout 300s;        
                                      
       proxy_set_header Host $host;  
       proxy_set_header X-Real-IP $remote_addr;  
