@@ -1,5 +1,5 @@
 <template>
-<div v-if="show">
+<div v-if="isshow">
   <el-table
     :data=Data
     style="width: 100%"
@@ -58,33 +58,41 @@ export default {
     data () {
         return {
           //show: true,
+          data: {}
         }
     },
     computed: {
-    ...mapState(['Data','show','ENV'])
+    ...mapState(['Data','isshow','ENV'])
   },
   mounted () {
-    var show = localStorage.getItem('show')
-    if (show == "true"){
-          show = true
+     var data = {}
+      data['url'] = '/api/names'
+     this.$store.dispatch('Getenv', data).then((res) => {
+    if (localStorage.getItem('ENV') == null){
+            console.log("22222")
+           console.log("show2: ",this.ENV)
+          this.data["env"] = this.ENV
+          this.data["namespace"] = null
+          this.data['url'] = '/api/namespace'
+          this.data['name'] = 'null'
+          console.log("data: ",this.data)
+          this.$store.dispatch('Postdata',this.data)   
         }else{
-          show = false
-        }
-    this.$store.commit('hildshow', show)
-    this.$store.commit('UpdateENV', localStorage.getItem('env'))
-    if (this.show){
-      var data = {}
-      data["env"] = this.ENV
-      data["namespace"] = null
-      data['url'] = '/api/namespace'
-      data['name'] = 'null'
-      this.$store.dispatch('Postdata',data)
+          console.log("1")
+           this.$store.commit('UpdateENV', localStorage.getItem('ENV'))
+           console.log("isshow1: ",this.isshow)
+            if (this.isshow == true){
+           console.log("show2: ",this.ENV)
+          this.data["env"] = this.ENV
+          this.data["namespace"] = null
+          this.data['url'] = '/api/namespace'
+          this.data['name'] = 'null'
+           console.log("show2: ",this.data)
+          this.$store.dispatch('Postdata',this.data)   
+            }
       }
-    //   if (this.$store.state.ENV === "test"){
-    //      this.$store.dispatch('Getdata',"namespace")
-    //    }else{
-    //        this.$store.dispatch('Getdata',"prod/namespace")
-    //    }
+     })
+   
     
   },
   methods: {

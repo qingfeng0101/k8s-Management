@@ -7,8 +7,8 @@ export default new Vuex.Store({
     state: {
         Tabbarname: 'GetHost',
         Data: [],
-        isshow: true,
-        show: true,
+        isshow: false,
+        show: false,
         Env: [],
         Pod: {},
         Deplyment: [],
@@ -35,6 +35,7 @@ export default new Vuex.Store({
         },
         Updateenv(state, data) {
             state.Env = data
+
         },
         hildShowtabbar(state, data) {
             state.isShowtabelbar = data
@@ -131,6 +132,7 @@ export default new Vuex.Store({
             }).then(res => {
                 state.commit('UpdatePod', res.data.message)
             })
+
         },
         Uploadenv(state, data) {
             let param = new FormData()
@@ -149,21 +151,13 @@ export default new Vuex.Store({
                 state.commit('Updateenv', res.data.message)
             })
         },
-        Getenv(state, data) {
+        Getenv(state, params) {
             // axios.post(`http://192.168.0.105:8080${data.url}`, data).then(res => {
             //     console.log(res)
             // })
-            axios({
+            return axios({
                 method: 'get',
-                url: `http://127.0.0.1:8080${data.url}`,
-            }).then(res => {
-                console.log('Updateenv: ', res.data.message)
-                if (res.data.message === null) {
-                    return
-                } else {
-                    state.commit('Updateenv', res.data.message)
-                }
-
+                url: `http://127.0.0.1:8080${params.url}`,
             })
         },
         UpdataDeployment(state, data) {

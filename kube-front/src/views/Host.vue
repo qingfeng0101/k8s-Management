@@ -1,7 +1,7 @@
 <template>
-  <div v-if="show">
+  <div v-if="isshow">
    <el-table
-    :data=Data
+    :data="Data"
     style="width: 100%"
     max-height="800px">
     <el-table-column
@@ -46,38 +46,44 @@ export default {
     }
   },
   computed: {
-    ...mapState(['Data','show','ENV'])
+    ...mapState(['Data','isshow','ENV'])
   },
   mounted () {
-      
-      // var data = {}
-      // data['url'] = '/api/names'
-      // this.$store.dispatch('Getenv',data)
-      //  console.log("length1: ",this.Data)
-      // if (this.Data.length === 0){
-      //   console.log("length: ",this.Data)
-      //   this.show = false
-      // }
-      // else{
-        var show = localStorage.getItem('show')
-        if (show == "true"){
-          show = true
-        }else{
-          show = false
-        }
-        this.$store.commit('hildshow', show)
-        this.$store.commit('UpdateENV', localStorage.getItem('env'))
-        if (this.show){
-           console.log("show2: ",this.show)
+        var data = {}
+      data['url'] = '/api/names'
+     this.$store.dispatch('Getenv', data).then((res) => {
+        if (localStorage.getItem('ENV') == null){
+          
+            console.log("22222")
+           console.log("show2: ",this.ENV)
           this.data["env"] = this.ENV
           this.data["namespace"] = null
           this.data['url'] = '/api/nodes'
           this.data['name'] = 'null'
+          console.log("data: ",this.data)
+          this.$store.dispatch('Postdata',this.data)   
+        }else{
+          console.log("1")
+           this.$store.commit('UpdateENV', localStorage.getItem('ENV'))
+           console.log("isshow1: ",this.isshow)
+            if (this.isshow == true){
+           console.log("show2: ",this.ENV)
+          this.data["env"] = this.ENV
+          this.data["namespace"] = null
+          this.data['url'] = '/api/nodes'
+          this.data['name'] = 'null'
+           console.log("show2: ",this.data)
           this.$store.dispatch('Postdata',this.data)   
         }
+        }
+     })
+      
         
       //}
       
-  }
+  },
+  methods: {
+       
+      },
 }
 </script>

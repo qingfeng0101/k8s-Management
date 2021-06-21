@@ -35,6 +35,7 @@ export default {
   mounted () {
     this.$store.commit('hildShowtabbar', false)
     this.data["env"] = localStorage.getItem('ENV')
+    this.data["cname"] = localStorage.getItem('cname')
     var name = localStorage.getItem('name')
     var namespace = localStorage.getItem('namespace')
     this.name = name

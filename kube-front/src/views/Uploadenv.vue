@@ -55,9 +55,17 @@ import { mapState } from 'vuex'
     this.$store.commit('hildShow', true)
   },
     mounted() {
+      this.$store.commit('hildShow', false)
+      
+      localStorage.setItem('activeName','Uploadenv')
          var data = {}
          data['url'] = '/api/names'
-         this.$store.dispatch('Getenv',data)
+         this.$store.dispatch('Getenv',data).then((res) => {
+           if (res.data.message != null){
+              this.$store.commit('Updateenv', res.data.message)
+           }
+           
+         })
          console.log(this.Env)
 
     }, 
@@ -70,7 +78,7 @@ import { mapState } from 'vuex'
            var a = this.Env.findIndex(item => item.name == file.name);
            this.Env.splice(a, 1);
            if (this.Env.length != 0){
-               localStorage.setItem('env',this.Env[0].name); 
+               localStorage.setItem('ENV',this.Env[0].name); 
            }else if (this.Env.length === 0){
              console.log("11111")
              this.$store.commit('hildshow', false)
@@ -106,7 +114,7 @@ import { mapState } from 'vuex'
                    data['name'] = this.input
                    this.$store.dispatch('Uploadenv', data)
                    this.$store.commit('UpdateENV', this.input)
-                   localStorage.setItem('env',this.input)
+                   localStorage.setItem('ENV',this.input)
                    localStorage.setItem('show',true);
          }else{
              console.log("2")
@@ -123,7 +131,7 @@ import { mapState } from 'vuex'
                    data['name'] = this.input
                    this.$store.dispatch('Uploadenv', data)
                    this.$store.commit('UpdateENV', this.input)
-                   localStorage.setItem('env',this.input)
+                   localStorage.setItem('ENV',this.input)
                    localStorage.setItem('show',true);
             }
         }}

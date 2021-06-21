@@ -1,7 +1,7 @@
 <template>
 <div>
 <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-    <el-tab-pane label="pods列表" name="pod">详情</el-tab-pane>
+    <el-tab-pane label="pods详情" name="pod">详情</el-tab-pane>
     <el-tab-pane label="返回" name="pods">返回</el-tab-pane>
   </el-tabs>
 
@@ -100,7 +100,8 @@ export default {
     this.data['namespace'] = this.namespace
     this.data['url'] = '/api/getpodinfo'
     this.$store.dispatch('GetPodinfo', this.data)
-    // this.$router.push("/pods")
+    console.log("pod: ",this.Pod)
+    //this.$router.push("/pods")
      
   },
   methods: {
