@@ -35,7 +35,10 @@
       </tr>
       <tr >
         <td >Image</td>
-        <td>{{Container.Image}}</td>
+        <td  v-show=data_show>{{Container.Image}}</td>
+        <td v-show=label_show><el-input v-model="input" :placeholder=Container.Image></el-input></td>
+        <td ><el-button size="medium" @click=showdata>编辑</el-button></td>
+        <td ><el-button size="medium" @click=showlabel(index) >保存</el-button></td>
       </tr>
       <tr >
         <td >Image ID</td>
@@ -75,7 +78,10 @@ export default {
       activeName: 'pod',
       namespace: '',
       name: '',
-      data: {}
+      data: {},
+      input: '',
+      data_show: true,
+      label_show: false,
     }
   },
   beforeMount () {
@@ -117,6 +123,20 @@ export default {
       localStorage.setItem('activeName', tab.name)
       this.$store.commit('UpdateTabbarname', tab.name)
       this.$router.push(tab.name)
+    },
+    showdata(){
+      this.data_show = false
+      this.label_show = true
+    },
+    showlabel(index){
+      this.data_show = true
+      this.label_show = false
+      this.data['num'] = index
+      this.data['namespace'] = this.namespace
+      this.data['name'] = this.podname
+      this.data['images'] = this.input
+      this.data['url'] = '/api/updateimages'
+      this.$store.dispatch('Postdata', this.data)
     }
   }
 }

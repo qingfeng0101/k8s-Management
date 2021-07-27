@@ -109,10 +109,12 @@ export default {
     changes(){
       
       console.log("test2")
+      console.log("111: ",this.activeName)
+      console.log("2222: ",this.activeName)
       this.$store.commit('UpdateENV', this.radio1)
       var data = {}
       localStorage.setItem('ENV', this.radio1)
-      if (this.activeName === "GetHost" &&  this.show === true){
+      if (this.activeName === "GetHost"){
         data["env"] = this.radio1
         data["namespace"] = null
         data['url'] = '/api/nodes'

@@ -49,6 +49,11 @@
           size="small">
           <el-button type="text" @click="open(scope.$index, Data)">删除</el-button>
         </el-button>
+        <el-button
+          type="text"
+          size="small">
+          <el-button type="text" @click="info(scope.$index, Data)">查看详情</el-button>
+        </el-button>
 
         <el-button
           @click.native.prevent="Add(scope.$index, Data)"
@@ -160,6 +165,14 @@ export default {
       localStorage.setItem('activeName', tab.name)
       this.$store.commit('UpdateTabbarname', tab.name)
       this.$router.push(tab.name)
+    },
+    info (index, rows) {
+       this.podname = rows[index].name
+      this.data['name'] = this.podname
+      this.data['namespace'] = rows[index].namespace
+      localStorage.setItem('podname', this.podname)
+      localStorage.setItem('namespace', rows[index].namespace)
+      this.$router.push('/deploymentInfo')
     }
   }
 

@@ -72,6 +72,22 @@
           <el-button type="primary" @click.native.prevent="confirm">确 定</el-button>
        </span>
       </el-dialog>
+      <el-button type="text" @click.native.prevent="exec(scope.$index, Data)">进入pod终端</el-button>
+        
+       <el-dialog
+          :modal="false"
+          title="提示"
+          :visible.sync="centerDialogVisible"
+           width="30%"
+           center>
+           <div v-for="(item,index) in Pod.containers" :key=index>
+             <el-radio    v-model=radio :label=index>{{item.Name}}</el-radio>
+           </div>
+           <span slot="footer" class="dialog-footer">
+         <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click.native.prevent="execs">确 定</el-button>
+       </span>
+      </el-dialog>
       </template>
     </el-table-column>
   </el-table>
@@ -183,8 +199,24 @@ export default {
        this.centerDialogVisible =false
        localStorage.setItem('cname',this.Pod.containers[this.radio].Name)
        this.$router.push('/logs')
+    },
+    exec (index, rows) {
+      this.names = rows[index]
+      this.centerDialogVisible =true
+      var radio1 = "1"
+      this.data['env'] = localStorage.getItem('ENV')
+      this.data['url'] = '/api/getpodinfo'
+      this.data['name'] = rows[index].name
+      this.data['namespace'] = rows[index].namespace
+      this.$store.dispatch('GetPodinfo', this.data)
+      localStorage.setItem('name',rows[index].name)
+      console.log("openpodlogs",this.Pod)
+    },
+    execs(){
+      this.centerDialogVisible =false
+       localStorage.setItem('cname',this.Pod.containers[this.radio].Name)
+       this.$router.push('/podexec')
     }
-
 }}
 </script>
 

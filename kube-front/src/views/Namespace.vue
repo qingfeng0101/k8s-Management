@@ -110,7 +110,7 @@ export default {
       this.$router.push('/pods')
       },
     getdeployment (index, rows) {
-        var namespace = rows[index].name
+      var namespace = rows[index].name
       localStorage.setItem('namespace', namespace)
       var data = {}
        data['url'] = '/api/getdeplyment'

@@ -8,6 +8,8 @@ import Host from './views/Host'
 import Deployment from './views/Deployment'
 import Uploadenv from './views/Uploadenv'
 import Nodeinfo from './views/nodeinfo'
+import Deploymentinfo from './views/DeployemntINFO'
+import Podexec from './views/PodExec'
 const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err)
@@ -64,6 +66,15 @@ export default new Router({
             name: 'Nodeinfo',
             component: Nodeinfo
         },
-
+        {
+            path: '/deploymentInfo',
+            name: 'Deploymentinfo',
+            component: Deploymentinfo
+        },
+        {
+            path: '/podexec',
+            name: 'Podexec',
+            component: Podexec
+        },
     ]
 })

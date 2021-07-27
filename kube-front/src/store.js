@@ -62,7 +62,8 @@ export default new Vuex.Store({
                     'name': data.name,
                     'namespace': data.namespace,
                     'env': data.env,
-                    'num': data.num
+                    'num': data.num,
+                    'image': data.image
                 },
                 transformRequest: [function(data) {
                     // Do whatever you want to transform the data
@@ -134,6 +135,7 @@ export default new Vuex.Store({
             })
 
         },
+
         Uploadenv(state, data) {
             let param = new FormData()
             console.log("data: ", data.data)
