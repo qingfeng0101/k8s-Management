@@ -1,7 +1,7 @@
 <template>
 <div>
 <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-    <el-tab-pane label="pods列表" name="pod">详情</el-tab-pane>
+    <el-tab-pane label="pods详情" name="pod">详情</el-tab-pane>
     <el-tab-pane label="返回" name="pods">返回</el-tab-pane>
   </el-tabs>
 
@@ -9,22 +9,22 @@
 <span>
       <tr >
         <td >Name</td>
-        <td >{{$store.state.Pod.name}}</td>
+        <td >{{Pod.name}}</td>
       </tr>
       <tr >
         <td ><pre>Namespace    </pre></td>
-        <td >{{$store.state.Pod.namespace}}</td>
+        <td >{{Pod.namespace}}</td>
       </tr>
       <tr >
         <td >Labels</td>
         <td >
-        <span v-for="(label,key) in $store.state.Pod.labels" :key=key>
+        <span v-for="(label,key) in Pod.labels" :key=key>
         {{key}} = {{label}}
         </span>
         </td>
       </tr>
     </span>
-    <span   v-for="(Container,index) in $store.state.Pod.containers" :key=index>
+    <span   v-for="(Container,index) in Pod.containers" :key=index>
       <tr >
         <td >Container Name</td>
         <td >{{Container.Name}}</td>
@@ -68,6 +68,7 @@
 
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -86,6 +87,9 @@ export default {
     // this.$store.state.isShowtabelbar = true
     this.$store.commit('Showtabbar', true)
   },
+  computed: {
+    ...mapState(['Pod'])
+  },
   mounted () {
     // console.log("mounted data",$store.state.Pods)
     this.$store.commit('hildShowtabbar', false)
@@ -96,7 +100,8 @@ export default {
     this.data['namespace'] = this.namespace
     this.data['url'] = '/api/getpodinfo'
     this.$store.dispatch('GetPodinfo', this.data)
-    // this.$router.push("/pods")
+    console.log("pod: ",this.Pod)
+    //this.$router.push("/pods")
      
   },
   methods: {

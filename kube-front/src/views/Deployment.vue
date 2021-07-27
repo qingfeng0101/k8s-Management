@@ -5,7 +5,7 @@
     <el-tab-pane label="返回" name="Getnamespace">返回</el-tab-pane>
   </el-tabs>
     <el-table
-    :data=$store.state.Data
+    :data=Data
     style="width: 100%"
     max-height="800">
     <el-table-column
@@ -47,20 +47,20 @@
         <el-button
           type="text"
           size="small">
-          <el-button type="text" @click="open(scope.$index, $store.state.Data)">删除</el-button>
+          <el-button type="text" @click="open(scope.$index, Data)">删除</el-button>
         </el-button>
 
         <el-button
-          @click.native.prevent="Add(scope.$index, $store.state.Data)"
+          @click.native.prevent="Add(scope.$index, Data)"
           type="text"
           size="small">
           扩容
 
         </el-button>
-        <el-input  maxlength="10" v-model=num placeholder="请输入内容" v-show=$store.state.Data[scope.$index].isshow></el-input>
+        <el-input  maxlength="10" v-model=num placeholder="请输入内容" v-show=Data[scope.$index].isshow></el-input>
         <el-button
-          v-show=$store.state.Data[scope.$index].isshow
-          @click.native.prevent="OK(scope.$index, $store.state.Data)"
+          v-show=Data[scope.$index].isshow
+          @click.native.prevent="OK(scope.$index, Data)"
           type="text"
           size="small">
 
@@ -72,6 +72,7 @@
     </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -92,6 +93,9 @@ export default {
   beforeDestroy () {
     // this.$store.state.isShowtabelbar = true
     this.$store.commit('Showtabbar', true)
+  },
+  computed: {
+    ...mapState(['Data'])
   },
   mounted () {
     this.$store.commit('hildShowtabbar', false)

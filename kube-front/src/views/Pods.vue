@@ -5,7 +5,7 @@
     <el-tab-pane label="返回" name="Getnamespace">返回</el-tab-pane>
   </el-tabs>
   <el-table
-    :data=$store.state.Data
+    :data=Data
     style="width: 100%"
     max-height="800">
     <el-table-column
@@ -45,29 +45,40 @@
       width="300">
       <template slot-scope="scope">
         <el-button
-        @click.native.prevent="Delete(scope.$index, $store.state.Data)"
+        @click.native.prevent="Delete(scope.$index, Data)"
           type="text"
           size="small">
-          <el-button type="text" @click="open(scope.$index, $store.state.Data)">删除</el-button>
+          <el-button type="text" @click="open(scope.$index, Data)">删除</el-button>
         </el-button>
         <el-button
-          @click.native.prevent="Podinfo(scope.$index, $store.state.Data)"
+          @click.native.prevent="Podinfo(scope.$index, Data)"
           type="text"
           size="small">
           查看pod详情
         </el-button>
-        <el-button
-          @click.native.prevent="GetPodLog(scope.$index, $store.state.Data)"
-          type="text"
-          size="small">
-          查看pod日志
-        </el-button>
+        <el-button type="text" @click.native.prevent="logs(scope.$index, Data)">查看pod日志</el-button>
+        
+       <el-dialog
+          :modal="false"
+          title="提示"
+          :visible.sync="centerDialogVisible"
+           width="30%"
+           center>
+           <div v-for="(item,index) in Pod.containers" :key=index>
+             <el-radio    v-model=radio :label=index>{{item.Name}}</el-radio>
+           </div>
+           <span slot="footer" class="dialog-footer">
+         <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click.native.prevent="confirm">确 定</el-button>
+       </span>
+      </el-dialog>
       </template>
     </el-table-column>
   </el-table>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -75,8 +86,16 @@ export default {
       activeName: 'pods',
       podname: 'test',
       pods: [],
-      data: {}
+      data: {},
+      radio: 0,
+      centerDialogVisible: false,
+      modal:false,
+      names:{}
+      
     }
+  },
+  computed: {
+    ...mapState(['Data','Pod'])
   },
   beforeMount () {
     // bus.$emit('maizuo', false)
@@ -127,7 +146,7 @@ export default {
       })
     },
     Podinfo (index, rows) {
-      
+      console.log("rows: ",rows)
       this.podname = rows[index].name
       this.data['name'] = this.podname
       this.data['namespace'] = rows[index].namespace
@@ -144,10 +163,29 @@ export default {
       localStorage.setItem('activeName', tab.name)
       this.$store.commit('UpdateTabbarname', tab.name)
       this.$router.push(tab.name)
+    },
+    test(){
+      return this.Pod.containers
+    },
+    logs (index, rows) {
+      this.names = rows[index]
+      this.centerDialogVisible =true
+      var radio1 = "1"
+      this.data['env'] = localStorage.getItem('ENV')
+      this.data['url'] = '/api/getpodinfo'
+      this.data['name'] = rows[index].name
+      this.data['namespace'] = rows[index].namespace
+      this.$store.dispatch('GetPodinfo', this.data)
+      localStorage.setItem('name',rows[index].name)
+      console.log("openpodlogs",this.Pod)
+    },
+    confirm(){
+       this.centerDialogVisible =false
+       localStorage.setItem('cname',this.Pod.containers[this.radio].Name)
+       this.$router.push('/logs')
     }
-  }
 
-}
+}}
 </script>
 
 <style lang="scss" scoped>
