@@ -20,6 +20,7 @@
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/json-iterator/go" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/leodido/go-urn" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/mattn/go-isatty" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/moby/spdystream" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/modern-go/concurrent" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/modern-go/reflect2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kubeadmin/src/github.com/spf13/pflag" vcs="Git" />

@@ -1,7 +1,0 @@
-package issue43616
-
-type foo int //@rename("foo","bar")
-
-var x struct{ foo }
-
-var _ = x.foo
